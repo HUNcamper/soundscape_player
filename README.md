@@ -4,11 +4,11 @@
 
 ## About
 This little tool/program can recognize and play Source Engine Soundscape scripts. Unpack them with GCFScape by opening the main VPK files, and checking the **scripts** folder, where the **soundscapes_*.txt** files are located. Load these files, and play them freely.
-_Half-Life 2 soundscape scripts are included in the package._
+_Half-Life 2 soundscape scripts are included in the releases._
 
 You also have to unpack the game's sound files by opening the main sound VPKs _(for Half-Life 2, it's called **hl2_sound_misc_dir.vpk**)_ and unpacking the **sound** folder. After unpacking it, copy and paste in the path of the folder into the program.
 
-#### Python dependencies:
+#### Python build dependencies:
 * [PyGame](https://www.pygame.org)
 * [tkinter](https://docs.python.org/2/library/tkinter.html) - preinstalled with Python most of the time
 

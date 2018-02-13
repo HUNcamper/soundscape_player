@@ -6,6 +6,7 @@ import time
 import random
 import threading
 import os.path
+import sys
 
 from tkinter import filedialog
 
@@ -50,8 +51,10 @@ lLoad = tk.Label(main, text="Load soundscape file:")
 def LoadButton_Pressed():
 	global soundScapes
 	filePath = filedialog.askopenfilename()
-	print("Selected file: {}".format(filePath))
-	soundScapes = LoadSoundscape(filePath, lbList)
+	if not filePath == '':
+		print("Selected file: {}".format(filePath))
+		soundScapes = LoadSoundscape(filePath, lbList)
+		main.title("Soundscape Player - {}".format(filePath.split("/")[-1]))
 
 # Sound path help button
 def SoundPathHelp_Pressed():
@@ -93,13 +96,13 @@ bStop = tk.Button(main, text="Stop Soundscape", command=StopButton_Pressed)
 
 
 # --- FUNCTIONS ---
-def MainTimer(stop=False):
+def MainTimer(stopEvent):
 	if not playingSoundScape == False:
 		for obj in playingSoundScape.objects:
 			obj.Play()
 
-	if not stop:
-		threading.Timer(1, MainTimer, [stop]).start()
+	if not stopEvent.is_set():
+		threading.Timer(1, MainTimer, [stopEvent]).start()
 
 def GetSoundScape(name):
 	for ss in soundScapes:
@@ -263,7 +266,11 @@ class SoundScapeObj:
 			if self.seconds % self.playtime == 0:
 				fname = random.choice(self.contents)
 				if os.path.isfile(GetPath(fname)):
-					self.sound = pg.mixer.Sound(GetPath(fname))
+					try:
+						self.sound = pg.mixer.Sound(GetPath(fname))
+					except Exception as e:
+						print("Failed to play {}: {}".format(fname, e))
+					
 					try:
 						volume = random.uniform(self.volume[0], self.volume[1]) * self.globalvolume
 					except Exception:
@@ -303,6 +310,15 @@ class SoundScapeObj:
 			else:
 				print("Failed to play soundscape '{}': Not found".format(self.soundscape))
 
+# --- PROTOCOLS ---
+def onClose():
+	stopEvent.set()
+	main.destroy()
+	sys.exit()
+main.protocol("WM_DELETE_WINDOW", onClose)
+
+# --- WIDGET PLACEMENT ---
+
 lLoad.grid(row=0, column=0)
 bLoad.grid(row=0, column=1)
 lSoundPath.grid(row=1, column=0)
@@ -313,10 +329,10 @@ bPlay.grid(row=4, column=0)
 lPlaying.grid(row=4, column=1)
 bStop.grid(row=4, column=2)
 
-MainTimer()
+stopEvent = threading.Event()
+MainTimer(stopEvent)
 
 main.resizable(False, False)
 main.title("Soundscape Player")
-main.wm_iconbitmap("resource/icon.ico")
 
 main.mainloop()
