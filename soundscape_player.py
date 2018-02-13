@@ -59,9 +59,7 @@ def PlayButton_Pressed():
 
 	if not playingSoundScape == False:
 		for obj in playingSoundScape.objects:
-			if not obj.sound == False:
-				obj.sound.stop()
-			obj.playing = False
+			obj.Stop()
 	
 	playingSoundScape = GetSoundScape(selected)
 	#if not playingSoundScape == False:
@@ -71,9 +69,7 @@ def StopButton_Pressed():
 	global playingSoundScape
 	if not playingSoundScape == False:
 		for obj in playingSoundScape.objects:
-			if not obj.sound == False:
-				obj.sound.stop()
-			obj.playing = False
+			obj.Stop()
 
 	playingSoundScape = False
 
@@ -112,7 +108,7 @@ def GetPath(add=""):
 		path += "/"
 
 	if not add == "":
-		if add.startswith("*"):
+		if add.startswith("*") or add.startswith("#") or add.startswith(")"):
 			add = add [ 1 : ]
 		while add.startswith("/") or add.startswith("\\"):
 			path = path[1 : ]
@@ -141,16 +137,15 @@ def LoadSoundscape(fname, listbox):
 				listbox.insert(listbox.size()+1, ssName)
 
 				if not soundScape == False:
-					soundScape.objects.append(obj)
+					if not obj == False:
+						soundScape.objects.append(obj)
 					soundscapes.append(soundScape)
-
-					
 
 				obj = False
 				soundScape = SoundScape(ssName)
 
 			elif depth == 1 and line.startswith('"playrandom"') or line.startswith('"playlooping"') or line.startswith('"playsoundscape"'):
-				if not obj == False:
+				if not soundScape == False and not obj == False:
 					soundScape.objects.append(obj)
 
 				ssName = RegExMatchGroup(regexQuote, line)
@@ -207,8 +202,10 @@ def LoadSoundscape(fname, listbox):
 			elif line.startswith("}"):
 				depth -= 1
 	
-	soundScape.objects.append(obj)
-	soundscapes.append(soundScape)
+	if not soundScape == False:
+		if not obj == False:
+			soundScape.objects.append(obj)
+		soundscapes.append(soundScape)
 
 	return soundscapes
 
@@ -237,6 +234,7 @@ class SoundScapeObj:
 		self.seconds = 0
 		self.globalvolume = 1
 		self.sound = False
+		self.isMusic = False
 
 	def GenPlayTime(self):
 		try:
@@ -245,6 +243,14 @@ class SoundScapeObj:
 				self.playtime = 1
 		except Exception:
 			self.playtime = self.time[0]
+
+	def Stop(self):
+		if self.playing:
+			if not self.sound == False:
+				self.sound.stop()
+			elif self.isMusic:
+				pg.mixer.music.stop()
+			self.playing = False
 
 	def Play(self):
 		if self.type == "playrandom":
@@ -266,10 +272,16 @@ class SoundScapeObj:
 					print("Failed to play sound {}, it doesn't exist".format(fname))
 		elif self.type == "playlooping" and not self.playing:
 			if os.path.isfile(GetPath(self.wave)):
-				print("Looping {}".format(self.wave))
-				self.sound = pg.mixer.Sound(GetPath(self.wave))
 				volume = float(self.volume[0]) * self.globalvolume
-				self.sound.play(-1)
+				if not self.wave.endswith(".mp3"):
+					print("Looping {}".format(self.wave))
+					self.sound = pg.mixer.Sound(GetPath(self.wave))
+					self.sound.play(-1)
+				else:
+					print("Playing music {}".format(self.wave))
+					pg.mixer.music.load(GetPath(self.wave))
+					pg.mixer.music.play()
+					self.isMusic = True
 				self.playing = True
 			else:
 				print("Failed to play sound {}, it doesn't exist".format(self.wave))
