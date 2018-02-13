@@ -32,6 +32,11 @@ lbList = tk.Listbox(main, width=100, height=20)
 # Sound path label
 lSoundPath = tk.Label(main, text="Root sound folder:")
 
+# Now Playing label
+labelText = tk.StringVar()
+labelText.set("No soundscape playing.")
+lPlaying = tk.Label(main, textvariable=labelText)
+
 # Sound path textbox
 tbSoundPath = tk.Text(main, height=1, width=50)
 tbSoundPath.insert(tk.INSERT, "H:/GCFScape extract/HL2/sound")
@@ -56,14 +61,13 @@ def PlayButton_Pressed():
 	global playingSoundScape
 	selected = lbList.get(lbList.curselection()[0]).strip()
 	print("Playing: '{}'".format(selected))
+	labelText.set("Playing: {}".format(selected))
 
 	if not playingSoundScape == False:
 		for obj in playingSoundScape.objects:
 			obj.Stop()
 	
 	playingSoundScape = GetSoundScape(selected)
-	#if not playingSoundScape == False:
-	#	MainTimer()
 
 def StopButton_Pressed():
 	global playingSoundScape
@@ -72,6 +76,7 @@ def StopButton_Pressed():
 			obj.Stop()
 
 	playingSoundScape = False
+	labelText.set("No soundscape playing.")
 
 # Load button
 bLoad = tk.Button(main, text="Browse...", command=LoadButton_Pressed)
@@ -298,7 +303,6 @@ class SoundScapeObj:
 			else:
 				print("Failed to play soundscape '{}': Not found".format(self.soundscape))
 
-
 lLoad.grid(row=0, column=0)
 bLoad.grid(row=0, column=1)
 lSoundPath.grid(row=1, column=0)
@@ -306,7 +310,13 @@ tbSoundPath.grid(row=1, column=1)
 bSoundPathHelp.grid(row=1, column=2)
 lbList.grid(row=3, columnspan=3)
 bPlay.grid(row=4, column=0)
+lPlaying.grid(row=4, column=1)
 bStop.grid(row=4, column=2)
 
 MainTimer()
+
+main.resizable(False, False)
+main.title("Soundscape Player")
+main.wm_iconbitmap("resource/icon.ico")
+
 main.mainloop()
