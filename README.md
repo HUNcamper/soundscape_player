@@ -1,5 +1,7 @@
 # Written in Python 3.6.4
 
+![Screenshot of the software](https://media.discordapp.net/attachments/238764565981036544/412983158296805387/unknown.png?width=470&height=325)
+
 ## About
 This little tool/program can recognize and play Source Engine Soundscape scripts. Unpack them with GCFScape by opening the main VPK files, and checking the **scripts** folder, where the **soundscapes_*.txt** files are located. Load these files, and play them freely.
 _Half-Life 2 soundscape scripts are included in the package._
