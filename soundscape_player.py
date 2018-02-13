@@ -276,12 +276,15 @@ class SoundScapeObj:
 		elif self.type == "playsoundscape" and not self.playing:
 			global playingSoundScape
 			soundscape = GetSoundScape(self.soundscape)
-			print("Playing soundscape '{}'".format(soundscape.name))
-			for o in soundscape.objects:
-				obj = o
-				obj.globalvolume = self.volume[0]
-				playingSoundScape.objects.append(obj)
-			self.playing = True
+			if not soundscape == False:
+				print("Playing soundscape '{}'".format(soundscape.name))
+				for o in soundscape.objects:
+					obj = o
+					obj.globalvolume = self.volume[0]
+					playingSoundScape.objects.append(obj)
+				self.playing = True
+			else:
+				print("Failed to play soundscape '{}': Not found".format(self.soundscape))
 
 
 lLoad.grid(row=0, column=0)

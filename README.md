@@ -16,6 +16,7 @@ You also have to unpack the game's sound files by opening the main sound VPKs _(
 ## Known issues:
 * Soundscapes with positioned sound sources can act weird, since no 3D sound functionality is implemented yet. For example, the Dust 2 soundscape plays all the music from the map at the same time at the same position.
 * No pitch change functionality is implemented yet, however, it's not really noticeable.
+* References to other soundscape files aren't possible yet.
 * Other left out functionalities
 
 ## Final notes:
